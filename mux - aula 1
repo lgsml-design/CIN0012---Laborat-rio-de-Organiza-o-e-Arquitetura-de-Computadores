@@ -1,0 +1,27 @@
+module mux
+  (
+    output logic [31:0] f,
+    input  logic [31:0] a, b, c, d,
+    input  logic [1:0]  sel
+  );
+
+  logic n_sel0, n_sel1;
+
+  not g_n0(n_sel0, sel[0]);
+  not g_n1(n_sel1, sel[1]);
+
+  genvar i;
+  generate
+    for (i = 0; i < 32; i++) begin : bit_mux
+      logic t0, t1, t2, t3;
+
+      // sel = 00 -> a | sel = 01 -> b | sel = 10 -> c | sel = 11 -> d
+      and g0(t0, a[i], n_sel1, n_sel0);
+      and g1(t1, b[i], n_sel1, sel[0]);
+      and g2(t2, c[i], sel[1], n_sel0);
+      and g3(t3, d[i], sel[1], sel[0]);
+      or  g4(f[i], t0, t1, t2, t3);
+    end
+  endgenerate
+
+endmodule
